@@ -356,7 +356,6 @@
     <a href="#s8"><span class="toc-num">08</span>主题分布与情绪交叉</a>
     <a href="#s9"><span class="toc-num">09</span>LLM 增强特征分析</a>
     <a href="#s10"><span class="toc-num">10</span>综合结论与建议</a>
-    <a href="#s11"><span class="toc-num">11</span>技术附录</a>
   </div>
 </div>
 
@@ -573,39 +572,6 @@
   └─ 否 → 优化标题/内容/渠道</pre>
 </section>
 
-<section id="s11">
-  <h2><span class="num">11</span>技术附录</h2>
-
-  <h3>数据流向</h3>
-  <pre>┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
-│  原始爬取   │ ──→ │  数据清洗  │ ──→ │ AI特征增强 │ ──→ │  可视化    │
-│  685 条     │     │  674 条   │     │ 30 条采样 │     │ 12 张SVG  │
-└────────────┘     └────────────┘     └────────────┘     └────────────┘</pre>
-
-  <h3>技术栈</h3>
-  <table>
-    <tr><th>环节</th><th>工具</th><th>说明</th></tr>
-    <tr><td>数据分析</td><td>Python 3.12 + pandas 3.0</td><td>全量 674 条</td></tr>
-    <tr><td>情感分析</td><td>SnowNLP 0.12</td><td>无监督，精度≈80%</td></tr>
-    <tr><td>中文分词</td><td>jieba 0.42</td><td>词频统计</td></tr>
-    <tr><td>可视化</td><td>Matplotlib 3.11</td><td>SVG 矢量图</td></tr>
-    <tr><td>LLM 增强</td><td>DeepSeek Chat / 规则引擎</td><td>3 路并发</td></tr>
-    <tr><td>部署</td><td>GitHub Pages</td><td>ahWaii/hot-chart-report</td></tr>
-  </table>
-
-  <h3>数据局限性</h3>
-  <ol>
-    <li><strong>来源偏倚</strong>：新闻网 92.9%，结论推广受限</li>
-    <li><strong>情感天花板</strong>：均值 0.994，区分度不足</li>
-    <li><strong>主题分类</strong>：基于关键词匹配，未覆盖新兴主题</li>
-    <li><strong>LLM 样本</strong>：仅 30 条（4.4%），统计稳定性有限</li>
-  </ol>
-
-  <h3>输出文件</h3>
-  <pre>📁 charts/       — 12 张 SVG 可视化图表
-📁 1.11/          — 原始数据 + 增强数据 + 分析脚本
-📄 index.html     — 本报告（图文版本）
-📄 report.md      — Markdown 原始版</pre>
 </section>
 
 </div><!-- /container -->
