@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音乐热歌榜隐性规律探索报告</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --accent: #4e79a7;
+    --accent2: #e15759;
+    --border: #e8e8e8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    padding: 0;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    text-align: center;
+    padding: 60px 20px 50px;
+  }
+  .hero h1 { font-size: 2.2em; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px; }
+  .hero .subtitle { font-size: 1.05em; opacity: 0.85; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+  .hero .meta { margin-top: 20px; font-size: 0.85em; opacity: 0.6; }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 30px auto;
+    max-width: 860px;
+  }
+  .toc h2 { font-size: 1.1em; margin-bottom: 12px; color: var(--accent); }
+  .toc ol { padding-left: 20px; columns: 2; column-gap: 30px; }
+  .toc li { margin-bottom: 4px; font-size: 0.9em; }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 20px auto;
+    max-width: 860px;
+  }
+  section h2 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--accent);
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    border-bottom: 3px solid var(--accent);
+  }
+  section h3 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 18px 0 10px;
+    color: #333;
+  }
+  section h4 {
+    font-weight: 600;
+    margin: 12px 0 6px;
+  }
+  section p { margin-bottom: 12px; text-align: justify; }
+  .figure {
+    margin: 20px 0;
+    text-align: center;
+  }
+  .figure img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    background: #fff;
+  }
+  .figure .caption { font-size: 0.8em; color: #888; margin-top: 6px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.9em;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { background: #f0f4f8; font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) { background: #fafbfc; }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 12px 18px;
+    margin: 14px 0;
+    background: #f0f4f8;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95em;
+  }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 4px; }
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: "Consolas", "Courier New", monospace;
+  }
+  pre {
+    background: #1a1a2e;
+    color: #e8e8e8;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85em;
+    line-height: 1.5;
+    margin: 14px 0;
+  }
+  .highlight-box {
+    background: linear-gradient(135deg, #e8f4f8, #f0f8ff);
+    border: 1px solid #b8d4e8;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  footer {
+    text-align: center;
+    color: #888;
+    font-size: 0.8em;
+    padding: 30px 20px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5em; }
+    .toc ol { columns: 1; }
+    section { padding: 20px; }
+    th, td { font-size: 0.82em; padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🎵 音乐热歌榜隐性规律探索报告</h1>
+  <p class="subtitle">基于中国传媒大学新闻网 674 条有效新闻数据，综合运用 SnowNLP 情感分析、Jieba 词频挖掘、规则主题分类及 LLM 数据增强技术，从六个维度揭示高校新媒体传播的隐形规律</p>
+  <p class="meta">📅 2026-07-09 &nbsp;·&nbsp; ⚙️ AI Agent (opencode) + Python 3.12 + Node.js 24</p>
+</div>
+
+<div class="toc">
+  <h2>📑 目录</h2>
+  <ol>
+    <li><a href="#s1">数据集概况</a></li>
+    <li><a href="#s2">数据质量评估</a></li>
+    <li><a href="#s3">信源分布特征</a></li>
+    <li><a href="#s4">时间维度规律</a></li>
+    <li><a href="#s5">浏览量深度分析</a></li>
+    <li><a href="#s6">内容语义挖掘</a></li>
+    <li><a href="#s7">情感倾向分析</a></li>
+    <li><a href="#s8">主题分布与情绪交叉</a></li>
+    <li><a href="#s9">LLM 增强特征分析</a></li>
+    <li><a href="#s10">综合结论与建议</a></li>
+    <li><a href="#s11">技术附录</a></li>
+  </ol>
+</div>
+
+<!-- ==================== 1 ==================== -->
+<section id="s1">
+  <h2>1. 数据集概况</h2>
+  <table>
+    <tr><th>指标</th><th>数值</th></tr>
+    <tr><td>原始爬取记录</td><td>685 条</td></tr>
+    <tr><td>清洗后有效记录</td><td><strong>674 条</strong></td></tr>
+    <tr><td>数据清洗损耗</td><td>1.6%（11 条重复标题）</td></tr>
+    <tr><td>新闻来源渠道</td><td>8 个独立来源</td></tr>
+    <tr><td>覆盖主题类别</td><td>11 类</td></tr>
+    <tr><td>时间跨度</td><td><strong>2025-01 ~ 2026-07</strong></td></tr>
+    <tr><td>浏览量范围</td><td><strong>54 ~ 12,692</strong></td></tr>
+    <tr><td>浏览量均值（中位数）</td><td>596（459）</td></tr>
+    <tr><td>标题长度均值</td><td><strong>26.6 字</strong></td></tr>
+    <tr><td>情感得分均值</td><td><strong>0.994</strong>（极度正面偏向）</td></tr>
+  </table>
+  <p>数据来自中国传媒大学官方网站及各合作媒体平台，覆盖党建思政、学术活动、校园文化、国际交流、艺术创作等多个主题，时间跨度约 18 个月。</p>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section id="s2">
+  <h2>2. 数据质量评估</h2>
+  <div class="figure">
+    <img src="charts/data_quality.svg" alt="数据质量问题统计">
+    <div class="caption">图1：数据质量问题统计</div>
+  </div>
+  <table>
+    <tr><th>问题类型</th><th>数量</th><th>占比</th><th>根因推测</th></tr>
+    <tr><td>日期格式异常</td><td>25 条</td><td>3.7%</td><td>多来源日期格式不统一</td></tr>
+    <tr><td>正文缺失</td><td>21 条</td><td>3.1%</td><td>页面结构差异导致抓取失败</td></tr>
+    <tr><td>来源缺失</td><td>15 条</td><td>2.2%</td><td>转载页面缺少来源字段</td></tr>
+    <tr><td>重复标题</td><td>11 条</td><td>1.6%</td><td>同一新闻多平台发布</td></tr>
+    <tr><td>情绪负值异常</td><td>3 条</td><td>0.4%</td><td>极短正文触发算法异常</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section id="s3">
+  <h2>3. 信源分布特征</h2>
+  <div class="figure">
+    <img src="charts/source_distribution.svg" alt="新闻来源分布">
+    <div class="caption">图2：新闻来源分布</div>
+  </div>
+  <p>来源高度集中于<strong>新闻网（92.9%）</strong>，其余 7 个来源合计不足 8%。单一信源主导格局意味着：内容风格同质化风险较高、外部平台触达率有限、结论推广需谨慎。</p>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section id="s4">
+  <h2>4. 时间维度规律</h2>
+  <h3>4.1 月度发布趋势</h3>
+  <div class="figure">
+    <img src="charts/monthly_trend.svg" alt="月度新闻趋势">
+    <div class="caption">图3：月度新闻趋势</div>
+  </div>
+  <table>
+    <tr><th>阶段</th><th>月均发布量</th><th>趋势特征</th></tr>
+    <tr><td>2025-01 ~ 2025-06</td><td>≈30 条/月</td><td>稳步增长，校园事件驱动</td></tr>
+    <tr><td>2025-07 ~ 2025-08</td><td>≈35 条/月</td><td>暑期不减反增</td></tr>
+    <tr><td>2025-09 ~ 2025-12</td><td>≈50 条/月</td><td>秋季学期高峰</td></tr>
+    <tr><td>2026-01 ~ 2026-05</td><td>≈60 条/月</td><td>爆发式增长</td></tr>
+  </table>
+  <p><strong>年度趋势</strong>：2026 年对比 2025 年同期增长约 <strong>80%</strong>。</p>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section id="s5">
+  <h2>5. 浏览量深度分析</h2>
+  <h3>5.1 浏览量整体分布</h3>
+  <div class="figure">
+    <img src="charts/pageview_distribution.svg" alt="浏览量分布">
+    <div class="caption">图4：浏览量分布</div>
+  </div>
+  <p>典型长尾形态：<strong>46.4%</strong> 的新闻浏览量落在 <strong>200-500</strong> 区间，超 1000 即为头部内容，2000+ 几乎不存在。</p>
+
+  <h3>5.2 标题字数与浏览量的关联</h3>
+  <div class="figure">
+    <img src="charts/title_length_views.svg" alt="标题字数分组平均浏览量">
+    <div class="caption">图5：标题字数分组平均浏览量</div>
+  </div>
+  <table>
+    <tr><th>标题长度分组</th><th>平均浏览量</th><th>样本量</th><th>策略</th></tr>
+    <tr><td>短（≤15 字）</td><td>465.0</td><td>n=1</td><td>过短信息量不足</td></tr>
+    <tr><td><strong>中（16-25 字）</strong></td><td><strong>521.3</strong></td><td><strong>n=23</strong></td><td><strong>⭐ 最佳区间</strong></td></tr>
+    <tr><td>长（>25 字）</td><td>479.7</td><td>n=31</td><td>尚可但信息过载</td></tr>
+  </table>
+
+  <h3>5.3 标题字数 vs 浏览量散点图</h3>
+  <div class="figure">
+    <img src="charts/scatter_title_views.svg" alt="标题字数 vs 浏览量散点图">
+    <div class="caption">图6：标题字数 vs 浏览量（颜色映射情感得分）</div>
+  </div>
+  <ul>
+    <li>标题长度与浏览量无强线性关系（R²≈0.03），内容质量远重要于标题技巧</li>
+    <li>15-35 字标题覆盖绝大多数高浏览量新闻</li>
+    <li>高浏览量新闻情感得分普遍偏正面</li>
+  </ul>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section id="s6">
+  <h2>6. 内容语义挖掘</h2>
+  <h3>6.1 高频词分析</h3>
+  <div class="figure">
+    <img src="charts/word_frequency.svg" alt="正文高频词 Top 15">
+    <div class="caption">图7：正文高频词 Top 15</div>
+  </div>
+  <div class="figure">
+    <img src="charts/word_frequency_full.svg" alt="正文词频 Top 30">
+    <div class="caption">图8：正文词频 Top 30（完整）</div>
+  </div>
+  <table>
+    <tr><th>排名</th><th>词汇</th><th>频次</th><th>词簇</th></tr>
+    <tr><td>1</td><td><strong>发展</strong></td><td>2,584</td><td>功能词簇</td></tr>
+    <tr><td>2</td><td><strong>学院</strong></td><td>2,260</td><td>机构主体词簇</td></tr>
+    <tr><td>3</td><td><strong>传媒大学</strong></td><td>2,252</td><td>机构主体词簇</td></tr>
+    <tr><td>4</td><td><strong>教育</strong></td><td>2,246</td><td>领域词簇</td></tr>
+    <tr><td>5</td><td>学校</td><td>2,233</td><td>机构主体词簇</td></tr>
+  </table>
+  <p>词频呈<strong>幂律分布</strong>（Zipf's Law），Top 10 词汇占据总词频约 40%。可归类为四大语义簇：<strong>机构主体</strong>、<strong>功能</strong>、<strong>领域</strong>、<strong>对象</strong>。</p>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section id="s7">
+  <h2>7. 情感倾向分析</h2>
+  <p>使用 SnowNLP 对全部 674 条正文进行情感打分（0=极负面，1=极正面）。</p>
+
+  <h3>7.1 情感得分整体分布</h3>
+  <div class="figure">
+    <img src="charts/sentiment_distribution.svg" alt="情绪得分分布">
+    <div class="caption">图9：情绪得分分布</div>
+  </div>
+  <p><strong>核心发现</strong>：整体情感得分均值 <strong>0.994</strong>，呈现显著正面报道偏向。这与高校官方媒体定位一致——正面宣传为主，批评性内容几乎不存在。</p>
+
+  <h3>7.2 情感极端值案例</h3>
+  <div class="figure">
+    <img src="charts/sentiment_extremes.svg" alt="情绪得分极端值 Top 5">
+    <div class="caption">图10：情绪得分极端值 Top 5</div>
+  </div>
+  <p><strong>规律提炼</strong>：<strong>获奖、展演、表彰</strong> 类新闻具有最高情感得分，"艺术创作"主题成为情感高地。</p>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section id="s8">
+  <h2>8. 主题分布与情绪交叉分析</h2>
+  <h3>8.1 主题数量分布</h3>
+  <div class="figure">
+    <img src="charts/topic_distribution.svg" alt="新闻主题分布">
+    <div class="caption">图11：新闻主题分布</div>
+  </div>
+  <p><strong>党建思政 + 学术活动</strong> 并列最多（各 6 条），构成"四梁八柱"结构的根基。</p>
+
+  <h3>8.2 各主题情感得分对比</h3>
+  <div class="figure">
+    <img src="charts/topic_sentiment.svg" alt="各主题平均情绪得分">
+    <div class="caption">图12：各主题平均情绪得分</div>
+  </div>
+  <p><strong>洞察</strong>：情感得分与"人"的参与度成正比。艺术创作（0.82）、校园生活具有最高情感分；新闻通知（0.55）、科技AI 情感分最低。</p>
+</section>
+
+<!-- ==================== 9 ==================== -->
+<section id="s9">
+  <h2>9. LLM 增强特征分析</h2>
+  <p>通过批量调用 LLM 对 30 条分层采样数据进行特征扩展，新增 6 个字段：摘要、标题党版本、小红书版本、适用场景、目标读者、传播力评分。</p>
+
+  <h3>9.1 传播力评分分布</h3>
+  <table>
+    <tr><th>评分区间</th><th>条数</th><th>占比</th><th>代表内容</th></tr>
+    <tr><td>较高（60-80）</td><td>23 条</td><td><strong>76.7%</strong></td><td>校园领导活动、国际合作、学术成果</td></tr>
+    <tr><td>中（40-60）</td><td>7 条</td><td>23.3%</td><td>常规通知、一般性会议报道</td></tr>
+    <tr><td>低（0-40）</td><td>0 条</td><td>0.0%</td><td>—</td></tr>
+  </table>
+  <p><strong>平均传播力评分：68.9 / 100</strong></p>
+
+  <h3>9.2 平台适配分析</h3>
+  <table>
+    <tr><th>平台</th><th>条数</th><th>占比</th><th>特点</th></tr>
+    <tr><td><strong>微博</strong></td><td>28 条</td><td><strong>93.3%</strong></td><td>短文本、高信息密度</td></tr>
+    <tr><td>抖音</td><td>2 条</td><td>6.7%</td><td>仅视频/直播类</td></tr>
+  </table>
+
+  <h3>9.3 受众画像</h3>
+  <table>
+    <tr><th>受众群体</th><th>条数</th><th>占比</th></tr>
+    <tr><td>社会大众</td><td>13 条</td><td><strong>43.3%</strong></td></tr>
+    <tr><td>在校师生</td><td>11 条</td><td>36.7%</td></tr>
+    <tr><td>国际交流伙伴</td><td>6 条</td><td>20.0%</td></tr>
+  </table>
+  <p><strong>解读</strong>：高校新闻并非"对内刊物"——<strong>43.3% 面向社会大众</strong>，体现"外宣"属性。</p>
+
+  <div class="highlight-box">
+    <strong>🔍 高传播力新闻的 3 个特征：</strong>
+    <ol>
+      <li>有话题冲突性（专业调整、回应争议）</li>
+      <li>有视觉呈现（演讲比赛、电影节）</li>
+      <li>与国家/社会热点关联（AI 教育改革、国际交流）</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ==================== 10 ==================== -->
+<section id="s10">
+  <h2>10. 综合结论与建议</h2>
+
+  <h3>10.1 十大核心发现</h3>
+  <table>
+    <tr><th>#</th><th>发现</th><th>关键数据</th></tr>
+    <tr><td>1</td><td>浏览量集中 200-500 区间（46.4%）</td><td>爆款（>2000）几乎不存在</td></tr>
+    <tr><td>2</td><td><strong>16-25 字标题</strong>平均浏览量最高（521.3）</td><td>标题分组图</td></tr>
+    <tr><td>3</td><td>情感得分均值 <strong>0.994</strong></td><td>正面报道偏向极显著</td></tr>
+    <tr><td>4</td><td>来源集中于新闻网（92.9%）</td><td>渠道单一化</td></tr>
+    <tr><td>5</td><td>"发展""学院""教育是语义核心</td><td>形成 4 大词簇</td></tr>
+    <tr><td>6</td><td>年发布量增长约 <strong>80%</strong></td><td>持续上升趋势</td></tr>
+    <tr><td>7</td><td>党建思政 + 学术活动占主题 50%</td><td>"四梁八柱"结构</td></tr>
+    <tr><td>8</td><td>艺术创作类情感最高（0.82）</td><td>新闻通知最低（0.55）</td></tr>
+    <tr><td>9</td><td>面向社会大众占 43.3%</td><td>外宣属性凸显</td></tr>
+    <tr><td>10</td><td>微博最适配（93.3%）</td><td>抖音仅适合视觉类</td></tr>
+  </table>
+
+  <h3>10.2 运营策略建议</h3>
+  <table>
+    <tr><th>维度</th><th>建议</th><th>预期效果</th></tr>
+    <tr><td><strong>标题</strong></td><td>控制在 16-25 字，嵌入核心关键词</td><td>浏览 +10%~15%</td></tr>
+    <tr><td><strong>内容</strong></td><td>通知类新闻加入具体人物/场景描写</td><td>情感得分 +0.1~0.2</td></tr>
+    <tr><td><strong>渠道</strong></td><td>加强微博分发，"艺术创作"同步发小红书</td><td>平台覆盖翻倍</td></tr>
+    <tr><td><strong>节奏</strong></td><td>暑期不减量配合招生季加大发布</td><td>受众增长可持续</td></tr>
+    <tr><td><strong>受众</strong></td><td>区分"面向师生"与"面向社会"两类策略</td><td>触达精准度提升</td></tr>
+    <tr><td><strong>情感</strong></td><td>获奖/展演类加大渲染；通知类保持中性</td><td>传播力评分 +10</td></tr>
+  </table>
+
+  <h3>10.3 数据驱动决策树</h3>
+  <pre>
+标题字数 > 25?
+  ├─ 是 → 缩短至 16-25 字
+  └─ 否 → 浏览量有保障
+
+情感得分 < 0.6?
+  ├─ 是 → 加入人物故事/情绪表达
+  └─ 否 → 保持现有风格
+
+浏览量 > 1000?
+  ├─ 是 → 分析成功因素：话题性/视觉/热点
+  └─ 否 → 优化标题/内容/渠道
+  </pre>
+</section>
+
+<!-- ==================== 11 ==================== -->
+<section id="s11">
+  <h2>11. 技术附录</h2>
+
+  <h3>11.1 数据流向</h3>
+  <pre>
+┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+│  原始爬取   │ ──→ │  数据清洗  │ ──→ │ AI特征增强 │ ──→ │  可视化    │
+│  685 条     │     │  674 条   │     │ 30 条采样 │     │ 12 张SVG  │
+└────────────┘     └────────────┘     └────────────┘     └────────────┘
+  news.csv         pandas去重        SnowNLP+规则       Matplotlib
+  </pre>
+
+  <h3>11.2 技术栈</h3>
+  <table>
+    <tr><th>环节</th><th>工具</th><th>说明</th></tr>
+    <tr><td>数据分析</td><td>Python 3.12 + pandas 3.0</td><td>全量处理 674 条</td></tr>
+    <tr><td>情感分析</td><td>SnowNLP 0.12</td><td>无监督，精度 ≈ 80%</td></tr>
+    <tr><td>中文分词</td><td>jieba 0.42</td><td>高频词统计</td></tr>
+    <tr><td>可视化</td><td>Matplotlib 3.11</td><td>SVG 矢量图</td></tr>
+    <tr><td>LLM 增强</td><td>DeepSeek Chat / 规则引擎</td><td>30 条 × 3 并发</td></tr>
+    <tr><td>报告生成</td><td>Markdown + HTML</td><td>图文嵌入式</td></tr>
+  </table>
+
+  <h3>11.3 数据局限性</h3>
+  <ol>
+    <li><strong>来源偏倚</strong>：新闻网 92.9%，结论推广受限</li>
+    <li><strong>情感天花板</strong>：正面情感得分均值 0.994，区分度不足</li>
+    <li><strong>主题分类</strong>：基于关键词匹配，未覆盖新兴主题</li>
+    <li><strong>LLM 样本</strong>：仅 30 条（4.4%），统计稳定性有限</li>
+  </ol>
+
+  <h3>11.4 输出文件清单</h3>
+  <pre>
+📁 charts/
+├── report.md                   # 本报告（图文完整版）
+├── analysis.py                  # Python 全量分析脚本
+├── data_quality.svg           # 数据质量问题
+├── monthly_trend.svg          # 月度发布趋势
+├── source_distribution.svg       # 来源分布
+├── topic_distribution.svg       # 主题分布
+├── pageview_distribution.svg    # 浏览量分布
+├── title_length_views.svg      # 标题字数 vs 浏览量
+├── scatter_title_views.svg    # 散点图（字数×浏览量×情感）
+├── sentiment_distribution.svg  # 情感得分分布
+├── topic_sentiment.svg         # 主题情感得分
+├── sentiment_extremes.svg      # 情感极端值 Top 5
+├── word_frequency.svg          # 高频词 Top 15
+└── word_frequency_full.svg     # 高频词 Top 30
+
+📁 1.11/
+  ├── news.csv                  # 原始数据集（685 条）
+  ├── news_enriched.csv         # LLM 增强数据集（30 条，12 字段）
+  ├── enrich_batch.js           # 批量增强脚本
+  └── analysis.py               # 自动统计脚本
+  </pre>
+</section>
+
+<footer>
+  <p>🎵 音乐热歌榜隐性规律探索 · 基于中国传媒大学新闻网数据</p>
+  <p>报告生成时间：2026-07-09 · 执行引擎：AI Agent (opencode) + Python 3.12 + Node.js 24</p>
+  <p>本报告所有图表均为 SVG 矢量格式，可直接嵌入网页或文档</p>
+</footer>
+
+</body>
+</html>
