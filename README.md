@@ -1,4 +1,4 @@
-# 🎵 中传要闻分析
+# 中传要闻分析
 
 > **一个从数据到部署的全流程 AI 协作实验**  
 > 基于中国传媒大学新闻网 674 条数据，综合运用 AI 编程助手 + 数据科学工具链 + LLM API，完成数据清洗、情感分析、词频挖掘、主题分类、可视化、图文报告和 GitHub Pages 部署的全链路交付。
@@ -224,7 +224,7 @@ Agent (迭代优化 + 文档生成)
 
 ```
 📦 hot-chart-report/
-├── 📁 charts/
+├── charts/
 │   ├── analysis.py                  # Python 全量分析脚本
 │   ├── prompt-log.md                # 完整 Prompt 交互记录
 │   ├── data_quality.svg           # 数据质量问题
@@ -239,7 +239,7 @@ Agent (迭代优化 + 文档生成)
 │   ├── sentiment_extremes.svg      # 情感极端值 Top 5
 │   ├── word_frequency.svg          # 高频词 Top 15
 │   └── word_frequency_full.svg     # 高频词 Top 30
-├── 📁 1.11/
+├── 1.11/
 │   ├── news.csv                    # 原始数据集（685 条）
 │   ├── news_enriched.csv          # LLM 增强数据集（30 条 × 12 字段）
 │   ├── enrich_batch.js            # 批量 LLM 增强脚本

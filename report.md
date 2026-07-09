@@ -427,7 +427,7 @@
 ### 11.5 输出文件清单
 
 ```
-📁 charts/
+charts/
 ├── report.md                   # 本报告（图文完整版）
 ├── analysis.py                # Python 全量分析脚本
 ├── data_quality.svg           # 数据质量问题
@@ -443,7 +443,7 @@
 ├── word_frequency.svg         # 高频词 Top 15
 └── word_frequency_full.svg    # 高频词 Top 30
 
-📁 1.11/
+1.11/
 ├── news.csv                  # 原始数据集（685 条）
 ├── news_enriched.csv         # LLM 增强数据集（30 条，12 字段）
 ├── enrich_batch.js           # 批量增强脚本
